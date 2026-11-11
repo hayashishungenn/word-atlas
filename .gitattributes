@@ -1,0 +1,17 @@
+# Normalize line endings across Windows / macOS contributors.
+* text=auto eol=lf
+
+# Binary assets must never be touched by EOL conversion.
+*.webp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.mp3 binary
+*.wav binary
+*.m4a binary
+*.woff binary
+*.woff2 binary
+*.ico binary
+
+# Keep generated/lock files as-is.
+package-lock.json text eol=lf
