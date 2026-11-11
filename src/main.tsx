@@ -11,7 +11,11 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>,
 );
 
-if (import.meta.env.PROD && "serviceWorker" in navigator) {
+// The desktop shell ships every asset locally, so the offline cache buys nothing
+// there and its custom protocol does not serve service workers reliably.
+const isDesktopShell = "__TAURI_INTERNALS__" in window;
+
+if (import.meta.env.PROD && "serviceWorker" in navigator && !isDesktopShell) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => null);
   });
