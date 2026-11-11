@@ -1,5 +1,5 @@
 import { BookOpen, ChevronLeft, ChevronRight, Compass, Github, Keyboard, Moon, Search, Sun, User } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { AtlasContext, useAtlas, useEntry } from "./atlas/context";
 import { loadOpenAtlas, loadPrivateAtlas } from "./atlas/data";
 import type { Atlas } from "./atlas/types";
@@ -29,15 +29,29 @@ const NAV: { page: Route["page"]; label: string; icon: typeof Compass }[] = [
   { page: "me", label: "我的", icon: User },
 ];
 
+/** Follows the OS colour scheme, so "system" also reacts to a live theme switch. */
+function useSystemDark() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const m = matchMedia("(prefers-color-scheme: dark)");
+      m.addEventListener("change", onChange);
+      return () => m.removeEventListener("change", onChange);
+    },
+    () => matchMedia("(prefers-color-scheme: dark)").matches,
+    () => false,
+  );
+}
+
 function useTheme() {
   const theme = useStore((s) => s.settings.theme);
+  const systemDark = useSystemDark();
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "system") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", theme);
-    const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+    const dark = theme === "dark" || (theme === "system" && systemDark);
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0D1120" : "#F6F1E7");
-  }, [theme]);
+  }, [theme, systemDark]);
   return theme;
 }
 
@@ -119,7 +133,8 @@ function Shell({ privateAvailable }: { privateAvailable: boolean }) {
     if (!word) window.scrollTo({ top: 0 });
   }, [route.page]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+  const systemDark = useSystemDark();
+  const dark = theme === "dark" || (theme === "system" && systemDark);
 
   return (
     <div className={`app ${focus ? "is-focus" : ""}`}>

@@ -67,7 +67,7 @@ export const defaultSettings: Settings = {
   autoplay: true,
   dailyNew: 10,
   retention: 0.9,
-  theme: "dark",
+  theme: "system",
   sfx: true,
   spell: true,
   startLevel: 0,

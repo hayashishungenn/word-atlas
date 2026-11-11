@@ -18,14 +18,18 @@
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <link rel="preload" href="%BASE_URL%atlas/index.json" as="fetch" crossorigin="anonymous" />
     <script>
-      // Apply the saved theme (dark by default) before first paint.
+      // Apply the theme before first paint. "system" is the default and leaves the
+      // attribute off, so the prefers-color-scheme rules in app.css decide.
       (function () {
-        var t = "dark";
+        var t = "system";
         try {
           var s = JSON.parse(localStorage.getItem("word-atlas:settings") || "{}");
-          if (s.theme) t = s.theme;
+          if (s.theme === "light" || s.theme === "dark" || s.theme === "system") t = s.theme;
         } catch (e) {}
         if (t !== "system") document.documentElement.setAttribute("data-theme", t);
+        var dark = t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", dark ? "#0D1120" : "#F6F1E7");
       })();
     </script>
   </head>
